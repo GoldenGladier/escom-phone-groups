@@ -3,8 +3,10 @@
       <Navbar />
       <div class="container-banner">
           <div class="banner-text">
-            <h1>Titulo</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae officiis voluptate aspernatur nemo reprehenderit molestias, ullam alias modi dignissimos, a aut incidunt sed quos explicabo. Quae voluptas aut laudantium asperiores.</p>
+            <h1>Encuentra tus grupos facilmente</h1>
+            <p>Escom Groups busca poner a tu disposición todos los enlaces para que te unas a los grupos de tus materias. 
+                Todos los enlaces estan ordenados por carrera y por grupo, los enlaces pueden ser de whatsapp, telegram, facebook, etc.
+            </p>
           </div>
             <img src="../assets/invitation.svg" alt="groups-ws-escom" class="img">
           <!-- <img class="banner-footer" src="../assets/wave-blue.svg"> -->
@@ -41,10 +43,10 @@ export default {
     color: #ffff;
     overflow: hidden;
 }
-.wave{
-    /* background: #03256C; */
-    /* background: #ffffff; */
-}
+/* .wave{
+    background: #03256C;
+    background: #ffffff;
+} */
 
 .banner-footer{
     display: block;
@@ -59,6 +61,7 @@ export default {
 }
 .banner-text{
     width: 50%;
+    text-align: left;
 }
 .img{
     width: 30%;
@@ -85,7 +88,7 @@ export default {
       margin: auto;
   }
   .img{
-      width: 50%;
+      width: 70%;
   }
 }
 </style>

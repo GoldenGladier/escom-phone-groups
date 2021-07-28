@@ -1,7 +1,9 @@
 <template>
-  <div class="ItemGroupList">
+<transition name="bounce">
+  <div class="ItemGroupList" v-if="groupActive">
       <div class="group-data" v-on:click="collapse">
-        {{group}}
+        <!-- <OptionsGroup /> -->
+        {{group.name}}
         <button class="btn-view-more">
           <i class="bi bi-caret-up" v-if="collapsed"></i>
           <i class="bi bi-caret-down" v-else></i>
@@ -10,48 +12,59 @@
 
       <div class="container-subjects" v-if="collapsed">
         <div v-if="subjects" class="subjects-list">
-          <div class="item-subject-list" v-for="subject in subjects" :key="subject">
+          <div class="item-subject-list" v-for="subject in subjects" :key="subject['.key']">
 
-            <Options link='www.youtube.com' />
-            <!-- <div class="subject-options-container">
-              <button class="button btn-subject-options"><i class="bi bi-three-dots-vertical"></i></button>
-              <div class="subject-options">
-                <div class="item">Option 1</div>
-                <div class="item">Option 2</div>
-                <div class="item">Option 3</div>
-                <div class="item">Option 4</div>
-                <div class="item">Option 5</div>
-              </div>
-            </div> -->
+            <OptionsSubject :link="subject.linkSubject" @modal-subject-edit="handleEditSubject(subject.name, subject.linkSubject)"/>
             
             <!-- Subjects -->
             <div class="subject-name">
-              {{subject}}
+              {{subject.name}}
             </div>
             <div class="join-link">
-              <a href="www.youtube.com" class="button join-group"><i class="bi bi-person-plus"></i> Unirse</a>
+              <a :href="'//' + subject.linkSubject" target="_blank" class="button join-group"><i class="bi bi-person-plus"></i> Unirse</a>
             </div>
             <!-- = = = = =  -->
           </div>
+
+          <div class="item-subject-list">
+              <button class="button btn-create" v-on:click="modalActivate(group.name)"><i class="bi bi-journal-plus"></i> Crear nueva materia</button>
+          </div> 
         </div>
-        <h5 v-else>Aún no hay materias registradas para este grupo...</h5>
+
+        <div v-else class="subjects-list subjects-none">
+
+            <div class="item-subject-list message">
+              <i class="bi bi-info-circle"></i> Aún no hay materias registradas para este grupo...
+            </div> 
+            <div class="item-subject-list">
+              <button class="button btn-create" v-on:click="modalActivate(group.name)"><i class="bi bi-journal-plus"></i> Crear nueva materia</button>
+            </div> 
+
+        </div>
+
       </div>
   </div>
+</transition>
 </template>
 
 <script>
-import Options from './OptionsSubject.vue'
+import OptionsSubject from './OptionsSubject.vue'
 
 export default {
   name: 'ItemGroupList',
+  components : {
+    OptionsSubject,
+  },
   props : {
-    group : String,
+    group : [],
+    // groupKey : String,
     subjects : Array,
+    careerKey : String,
+    groupActive : Boolean,
   },
   data() {
     return {
       collapsed : false,
-      // options : false,
     }
   },
   methods : {
@@ -70,11 +83,16 @@ export default {
       else{
         this.options = true;
       } 
-    }
+    },
+    modalActivate : function(groupName) {
+      this.$emit("modal-open", this.careerKey, groupName);
+      // console.log("Click");
+    },
+    handleEditSubject : function (subjectName, Subjectlink){ // Abre el modal para editar materia
+      // console.log("EDIT 02" + Subjectlink);
+      this.$emit("modal-subject-edit", this.careerKey, this.group.name, subjectName, Subjectlink);
+    },
   },
-  components : {
-    Options,
-  }
 }
 </script>
 
@@ -116,11 +134,19 @@ export default {
   width: 100%;
   cursor: initial;
 }
+
 .item-subject-list{
   display: flex;
   justify-content: center;
   align-items: center;
   border-top: solid 1px #efefef;
+}
+
+.subjects-none .item-subject-list.message{
+  padding: 10px;
+}
+.subjects-none .item-subject-list.message i{
+  margin-right: 0.3rem;
 }
 
 .subject-name{
@@ -142,7 +168,7 @@ export default {
 
   border-color: #1768AC;
   background: #1768AC;
-  /* background: rgba(37, 65, 178, 0.40); */
+  /* background: rgba(23, 104, 172, 0.3); */
 }
 .join-group:hover{
   transition: 0.5s;
