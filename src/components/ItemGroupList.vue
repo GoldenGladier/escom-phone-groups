@@ -14,7 +14,8 @@
         <div v-if="subjects" class="subjects-list">
           <div class="item-subject-list" v-for="subject in subjects" :key="subject['.key']">
 
-            <OptionsSubject :link="subject.linkSubject" @modal-subject-edit="handleEditSubject(subject.name, subject.linkSubject)"/>
+            <OptionsSubject :link="subject.linkSubject" @modal-subject-edit="handleEditSubject(subject.name, subject.linkSubject)"
+             @modal-subject-delete="handleDeleteSubject(subject.name)" />
             
             <!-- Subjects -->
             <div class="subject-name">
@@ -91,6 +92,9 @@ export default {
     handleEditSubject : function (subjectName, Subjectlink){ // Abre el modal para editar materia
       // console.log("EDIT 02" + Subjectlink);
       this.$emit("modal-subject-edit", this.careerKey, this.group.name, subjectName, Subjectlink);
+    },
+    handleDeleteSubject : function (subjectName){ // Abre el modal para Eliminar la materia
+      this.$emit("modal-subject-delete", this.careerKey, this.group.name, subjectName);
     },
   },
 }

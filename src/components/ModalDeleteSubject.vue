@@ -13,41 +13,14 @@
                 <Loader />
           </div>
           <div class="modal-content" v-else>
-            <label for="subject-name" class="label">Nombre de la materia</label>
-            <input v-model="newName" autocomplete="off" type="text" class="input input-modal" 
-            placeholder="Ejemplos: Diseño de Sistemas Digitales, Sistemas Operativos, Administración de Proyectos, etc." name="subject-name">
-
-            <div class="message-container" v-if="nameAlert">
-                <p class="message msg-danger"><i class="bi bi-exclamation-circle"></i> El nombre de la materia no puede estar vacio.</p>
-            </div>
-            <div class="message-container" v-if="alertSubjectExist">
-                <p class="message msg-danger"><i class="bi bi-exclamation-circle"></i> La materia ya fue registrada para este grupo.</p>
-            </div>        
-
-            <label for="subject-url" class="label" id="label-subject-url">Link o enlace para unirse al grupo</label>
-            <div class="link-modal" v-on:click="linkFocus">
-              <div class="button icon-link" v-on:click="linkFocus">
-                  <i class="bi bi-link-45deg"></i>
-              </div>
-              <input v-model="newLink" autocomplete="off" type="text" class="input input-modal-link" placeholder="Ejemplo: https://chat.whatsapp.com/Fj9kBy8ALfs1PBLwCAqkm8" 
-              name="subject-url" id="subjectUrl" ref="subjectUrl"> 
-              <div class="btn-paste-container">
-                <button class="button btn-pegar" v-on:click="paste">Pegar</button>
-              </div>
-            </div>
-
-            <div class="message-container" id="message-paste" v-if="linkAlert">
-                <p class="message msg-danger"><i class="bi bi-exclamation-circle"></i> El link del grupo no puede estar vacio.</p>
-            </div>
-            <div class="message-container" v-if="!clipboardPermissions">
-                <p class="message msg-alert"><i class="bi bi-exclamation-circle"></i> Debes permitir acceso al portapapeles para usar el botón.</p>
-            </div>
-
+              ¿Estas seguro de que deseas eliminar la materia "{{subjectName}}" del grupo "{{groupName}}"?
           </div>
+
+
           <!-- FOOTER/BOTONES -->
           <div class="modal-footer">
               <button class="button btn-modal btn-cancel" v-on:click="modalDeactivate">Cancelar</button>
-              <button class="button btn-modal btn-create" @click="updateSubject">Guardar</button>
+              <button class="button btn-modal btn-delete" @click="deleteSubject">Eliminar</button>
           </div>
       </div>
   </div>
@@ -66,83 +39,34 @@ export default {
   props : {
     open : Boolean,
     title : String,
-    content : String,
-
+    
     careerKey : String,
     groupName : String,
-    name : String,
-    link : String,
+    subjectName : String,
   },
   components : {
       Loader,
   },
   data() {
     return {
-      clipboardPermissions : true,
-      nameAlert : false,
-      linkAlert : false,  
-      alertSubjectExist : false,  
-      newName : '', 
-      newLink : '',
       loading : false,
     }
   },  
-  watch: {
-      name : function () {
-        this.newName = this.name;
-          if(this.name != ''){
-            this.nameAlert = false;
-          }
-        // console.log('Name: ' + this.newName);
-      },
-      link : function () {
-          if(this.link != '')
-            this.linkAlert = false;
-        this.newLink = this.link; 
-        // console.log('Link: ' + this.newLink);
-      },
-      open : function (val) {
-          if(val == false){
-            this.nameAlert = false;
-            this.alertSubjectExist = false;
-            this.newName = this.name;
-            this.newLink = this.link;
-          }
-      }
-  },
   methods : {
     modalDeactivate : function () {
         this.$emit("modal-close");
-        this.alertSubjectExist = false;
         this.loading = false;
     },
-    linkFocus : function() {
-      this.$refs.subjectUrl.focus();
-    },
-    paste : function(){
-        navigator.clipboard.readText()
-        .then(texto => {
-            this.clipboardPermissions = true;
-            this.newLink = texto;
-            // console.log("Aquí tenemos el texto: ", texto);
-        })
-        .catch(error => {
-            // Por si el usuario no da permiso u ocurre un error
-            this.clipboardPermissions = false;
-            console.log("Hubo un error, probablemente no se han dado los permisos necesarios al sitio para usar el portapapeles: ", error);
-        });        
-    },
 
-    updateSubject : function(){
-        this.alertSubjectExist = false;
-        if(this.newName != '' && this.newLink != ''){
-            // console.log('Actualizando...');
+    deleteSubject : function(){
+            // console.log('Eliminando...');
             var career = this.escom[this.careerKey];
-            var indexSubject = -1, indexGroup = -1;
+            var indexSubject = -1;
+            var indexGroup = -1;
             var newGroup;
             if(!career.groups){
                 career.groups = [];
-                console.log("EDIT ERROR 01: No se encontraron grupos en " + career.name + " mientras se trataba de editar una materia.");
+                console.log("DELETE ERROR 01: No se encontraron grupos en " + career.name + " mientras se trataba de eliminar una materia.");
             }
             career.groups.forEach(group => { // Buscamos el grupo de la materia
                 if(group.name == this.groupName){
@@ -150,55 +74,31 @@ export default {
                     indexGroup = career.groups.indexOf(newGroup);
                     if(!newGroup.subjects){
                         newGroup.subjects = [];
-                        console.log("EDIT ERROR 02: No se encontraron materias en " + career.name + " - " + newGroup.name + " mientras se trataba de editar una materia.");
+                        console.log("EDIT ERROR 02: No se encontraron materias en " + career.name + " - " + newGroup.name + " mientras se trataba de eliminar una materia.");
                     }
                     newGroup.subjects.forEach(subject => {
-                        // console.log(subject.name + " - " + this.name);
-                        if( (subject.name == this.newName) && (this.newName != this.name) ){ // Comprobamos que el nombre nuevo y el anterior sea distinto
-                            this.alertSubjectExist = true;
-                            // console.log("Nombre en uso");
-                        }
-                        else{
-                            if(subject.name == this.name){
-                                indexSubject = newGroup.subjects.indexOf(subject);
-                                // console.log("Encontre el lugar a modificar: " + indexSubject);
-                            }
+                        if(subject.name == this.subjectName){
+                            indexSubject = newGroup.subjects.indexOf(subject);
                         }
                     });
                 }
             });
-            if(!this.alertSubjectExist){
-                this.loading = true;
-                var subject = career.groups[indexGroup].subjects[indexSubject];
-                subject.name = this.newName;
-                subject.linkSubject = this.newLink;
-                db.ref('escomCareers/' + this.careerKey).set(career).then( () => {
-                    console.log('¡Materia actualizada!');
-                    this.modalDeactivate();
-                } );  
+
+            this.loading = true;
+
+            newGroup.subjects.splice(indexSubject, 1);
+            if(newGroup.subjects.lenght <= 0){
+                newGroup.subjects = [];
             }
-        }
-        else{
-            if(this.name == ''){
-                this.nameAlert = true;
-            }
-            if(this.link == ''){
-                this.linkAlert = true;
-            }
-        }
-                            // newGroup.subjects.forEach(subject => {
-                    //     console.log(subject.name + " - " + this.name);
-                    //     if( (subject.name == this.name) && (!this.alertSubjectExist)){
-                    //         console.log(subject.name + " - " + this.name);
-                    //         this.loading = true;
-                    //         subject.name = this.newName;
-                    //         subject.linkSubject = this.newLink;
-                    //         db.ref('escomCareers/' + this.careerKey).set(career).then( () => {
-                    //             console.log('¡Materia actualizada!');
-                    //             this.modalDeactivate();
-                    //         } );                            
-                    //     }
-                    // });
+            // console.log("Eliminando: " + indexSubject);
+            // console.log(newGroup);
+            career.groups[indexGroup] = newGroup;
+
+            db.ref('escomCareers/' + this.careerKey).set(career).then( () => {
+                console.log('¡Materia eliminada!');
+                this.modalDeactivate();
+            } );  
+
     }
 
   },
@@ -243,7 +143,7 @@ export default {
 }
 
 .modal-title{
-    text-align: left;
+    text-align: center;
 }
 .modal-title h5{
     margin-right: 20px;
@@ -344,6 +244,12 @@ export default {
     min-width: 5rem;
 }
 
+.btn-modal{
+    padding: 5px;
+    margin: 0 4px;
+    min-width: 5rem;
+}
+
 @media only screen and (max-width: 769px) {
     .btn-paste-container, #message-paste{
         display: none;
@@ -357,14 +263,6 @@ export default {
 }
 
 /* ANIMATIONS */
-/* .up-enter-active, .up-leave-active {
-    transition: all 0.3s ease;
-}
-
-.up-enter, .up-leave-to {
-    transform: translateY(100%);
-} */
-
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s
 }

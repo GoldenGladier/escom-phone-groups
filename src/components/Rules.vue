@@ -15,12 +15,17 @@
                 <li>Registrar unicamente grupos y materias escolares, evita en todo momento registrar grupos no relacionados con la escuela y las clases.</li>
             </ul>
         </div>
-        <div class="handbook">
+        <div class="handbook-container" id="handbookList">
             <h3>Manual</h3>
             <h5>Registrar un grupo</h5>
             <div class="handbook-block">
-                
+                <!-- <img src="../assets/btn-create-group.png" alt=""> -->
+                <p>En la sección de tu carrera usa el botón "Nuevo grupo", ubicado al final de la sección (debajo de todos los grupos registrados).</p>
             </div>
+            <div class="handbook-block">
+                <!-- <img src="../assets/btn-create-group.png" alt=""> -->
+                <p>Luego registra el nombre del grupo en el formulario desplegado. Nota: No se admiten nombres iguales a los de otros grupos registrados en la misma carrera.</p>
+            </div>        
             <h5>Registrar una materia</h5>
             <h5>Editar una materia</h5>
             <h5>Eliminar una materia</h5>

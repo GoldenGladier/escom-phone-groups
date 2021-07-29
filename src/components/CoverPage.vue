@@ -5,7 +5,7 @@
           <div class="banner-text">
             <h1>Encuentra tus grupos facilmente</h1>
             <p>Escom Groups busca poner a tu disposición todos los enlaces para que te unas a los grupos de tus materias. 
-                Todos los enlaces estan ordenados por carrera y por grupo, los enlaces pueden ser de whatsapp, telegram, facebook, etc.
+                Todos los enlaces estan ordenados por carrera y por grupo, los enlaces pueden ser de Whatsapp, Telegram, Facebook, etc.
             </p>
           </div>
             <img src="../assets/invitation.svg" alt="groups-ws-escom" class="img">

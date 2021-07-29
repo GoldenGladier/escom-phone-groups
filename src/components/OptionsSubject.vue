@@ -7,7 +7,7 @@
             <button class="item" v-clipboard:copy="link" v-clipboard:success="handleOptions"><i class="bi bi-files"></i> Copiar vínculo</button>
             <!-- <div class="item"><i class="bi bi-share"></i> Compartir vínculo</div> -->
             <button class="item" @click="handleEditSubject"><i class="bi bi-pencil"></i> Editar materia</button>
-            <div class="item"><i class="bi bi-eraser"></i> Eliminar materia</div>
+            <button class="item" @click="handleDeleteSubject"><i class="bi bi-eraser"></i> Eliminar materia</button>
             <!-- <div class="item">Option 5</div> -->
         </div>
     </div>
@@ -39,6 +39,9 @@ export default {
       // console.log("EDIT" + this.link);
       // this.$emit("modal-subject-edit", this.subjectName, this.link);
       this.$emit("modal-subject-edit");
+    },
+    handleDeleteSubject : function (){
+      this.$emit("modal-subject-delete");
     },
   }
 }

@@ -7,15 +7,18 @@
       <ul class="nav-items">
           <li class="nav-item"><a href="#searchList"><i class="bi bi-search"></i> Buscar</a></li>
           <li class="nav-item"><a href="#rulesList"><i class="bi bi-bookmark-star"></i> Reglas</a></li>
-          <li class="nav-item"><a href=""><i class="bi bi-book"></i> Manual</a></li>
+          <li class="nav-item"><a href="#handbookList"><i class="bi bi-book"></i> Manual</a></li>
       </ul>
       <button class="button btn-list-menu" @click="openMenu">
-        <i class="bi bi-list" v-if="!open"></i>
-        <i class="bi bi-x" v-else></i>
+        <i class="bi bi-list"></i>
+        <!-- <i class="bi bi-x" v-else></i> -->
       </button>
       <transition name="bounce">
       <div class="responsive-nav" v-if="open">
-          <div class="panel-items">
+          <div class="panel-items" v-click-outside="openMenu">
+          <button class="button btn-list-menu close" @click="openMenu" >
+            <i class="bi bi-x"></i>
+          </button>
             <div class="responsive-items">
                 <a class="nav-item" href="#searchList" @click="openMenu"><i class="bi bi-search"></i> Buscar</a>
                 <a class="nav-item" href="#rulesList"><i class="bi bi-bookmark-star"></i> Reglas</a>
@@ -142,6 +145,14 @@ ul li{
     right: 0;
     z-index: 2;
 }
+.btn-list-menu.close{
+  z-index: 3;
+  /* background: tomato; */
+  top: 0;
+}
+.btn-list-menu.close i{
+  color: #2c3e50;
+}
 
 .responsive-nav{
     display: flex;
@@ -151,7 +162,7 @@ ul li{
     background: rgba(0, 0, 0, 0.3);
     height: 100vh;
     width: 100vw;
-    z-index: 1;
+    z-index: 2;
 }
 .panel-items{
     display: flex;

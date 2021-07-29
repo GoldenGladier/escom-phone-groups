@@ -4,7 +4,7 @@
     <div class="container-list" id="searchList">
       <!-- {{escom}} -->
       <h2>Buscar</h2>
-      <p>Selecciona tu carrera y después busca el grupo en el que estás inscrito.</p>
+      <p>Selecciona tu carrera y/o busca el grupo en el que estás inscrito.</p>
 
 
       <select name="selectCareer" class="input select-career" v-on:change="selectFilter" v-model="selectOption" >
@@ -15,7 +15,9 @@
       </select>
 
       <div class="search">
-        <input v-model="inputSearchGroup" @input="inputSearchGroup = $event.target.value.toUpperCase()" type="text" name="search-group" class="input search-group" placeholder="Ejemplo: 2CV15">
+        <input v-model="inputSearchGroup" @input="inputSearchGroup = $event.target.value.toUpperCase()" type="text" name="search-group" 
+        class="input search-group" placeholder="Busqueda por grupo">
+        <!-- Buscar grupo, ejemplos: 2CV15, 1CM8, 2CV6, etc." -->
         <button class="button search-group"><i class="bi bi-search"></i></button>
       </div>
     <!-- BUSQUEDA POR FILTRO (si existe) -->
@@ -50,7 +52,7 @@
         <div class="container-list-grid career-container" >
           <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
             :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" 
-            @modal-subject-edit="handleEditSubject" />
+            @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject"/>
             <!-- @create-subject="registerNewSubject"  -->
 
           <!-- New Group -->
@@ -75,9 +77,11 @@
     @create-group="registerNewGroup" :alertGroupExist="alertGroupExist" :loading="modalGroupLoading"/>
 
     <ModalEditSubject :open="modalSubjectEditActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
-    :name="subjectNameEdit" :link="subjectLinkEdit" @modal-close='handleEditSubject' @create-subject="registerNewSubject"/>
-    <ModalDeleteSubject :open="modalSubjectEditActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
-    :name="subjectNameEdit" :link="subjectLinkEdit" @modal-close='handleEditSubject' @create-subject="registerNewSubject"/>
+    :name="subjectNameEdit" :link="subjectLinkEdit" @modal-close='handleEditSubject' />
+    <!-- @create-subject="registerNewSubject" -->
+
+    <ModalDeleteSubject :open="modalSubjectDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
+    :subjectName="subjectName" @modal-close='handleDeleteSubject' />
 
     <Footer />
 
@@ -124,11 +128,10 @@ export default {
       careerName : "",
       loader : true,
 
+      // Filter
       selectOption : -1,
       filter : [],
       activeFilter : false,
-
-      // Filter
       inputSearchGroup : '',
 
       // Modal Group
@@ -144,12 +147,14 @@ export default {
       modalSubjectEditActive : false,
       subjectNameEdit : '',
       subjectLinkEdit : '',
+      // Delete
+      modalSubjectDeleteActive : false,
+      subjectName : '',
     }
   },
   watch : {
     inputSearchGroup : function () {
       this.selectFilter();
-      // this.inputFilter();
     },
     escom : function (value) {
       if(value.length === 0){
@@ -161,12 +166,18 @@ export default {
         this.loader = false;
       }
       this.selectFilter();
-      // this.inputFilter();
     },
+    selectOption : function(value){
+      localStorage.selectOptionFilterByCareer = value;
+    }
+  },
+  mounted() {
+    if (localStorage.selectOptionFilterByCareer) {
+      this.selectOption = localStorage.selectOptionFilterByCareer;
+    }
   },
   firebase : {
     // groups : db.ref('groups'),
-    // ESCOM : db.ref('escomCareers'),
     escom : db.ref('escomCareers'),
   },
   methods : {
@@ -245,6 +256,22 @@ export default {
           this.subjectNameEdit = subjectName;
           this.subjectLinkEdit = subjectLink;
           this.modalSubjectEditActive = true;
+          document.documentElement.style.overflow = 'hidden';
+        } 
+      },
+      handleDeleteSubject : function(careerKey, groupName, subjectName) {
+        // console.log("Escuchado" + subjectName);
+        if(this.modalSubjectDeleteActive){
+          this.modalSubjectDeleteActive = false;
+          document.documentElement.style.overflow = 'initial';
+        }
+        else{
+          this.titleModal = "Eliminar Materia"; 
+          this.careerKey = careerKey;
+          // console.log('Career key: '+this.careerKey);
+          this.groupName = groupName;
+          this.subjectName = subjectName;
+          this.modalSubjectDeleteActive = true;
           document.documentElement.style.overflow = 'hidden';
         } 
       },
@@ -348,7 +375,7 @@ export default {
         if(!subjectFound){ 
           this.alertSubjectExist = false;
           this.modalSubjectLoading = true; // <-- Activate the loader
-          console.log("REGISTRANDO MATERIA...");
+          // console.log("REGISTRANDO MATERIA...");
 
           var newSubject = new Object();
           newSubject.name = subjectName;
@@ -549,14 +576,24 @@ button.search-group{
 .btn-create{
   margin-top: 8px;
   border-color: #66DE93;
-  background: #66DE93;
+  /* background: #66DE93; */
   background: rgba(102, 222, 147, 0.1 );
   padding: 4px;
-  /* grid-column-start: 2;
-  grid-column-end: 3; */
 }
 .btn-create:hover{
   background: rgba(102, 222, 147, 0.3);
 }
 
+.btn-delete{
+  border-color: rgba(191, 19, 99, 0.6);
+  background: rgba(191, 19, 99, 0.1);
+  color: #38081f;
+  /* padding: 5px;
+  margin: 0 4px; */
+}
+.btn-delete:hover{
+  background: rgba(191, 19, 99, 0.15);
+  border-color: rgba(191, 19, 99, 0.6);
+  color: #38081f;
+}
 </style>
