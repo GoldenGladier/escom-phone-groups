@@ -22,7 +22,8 @@
               {{subject.name}}
             </div>
             <div class="join-link">
-              <a :href="'//' + subject.linkSubject" target="_blank" class="button join-group"><i class="bi bi-person-plus"></i> Unirse</a>
+              <a :href="subject.linkSubject" target="_blank" class="button join-group"><i class="bi bi-person-plus"></i> Unirse</a>
+              <!-- <a :href="'//' + subject.linkSubject" target="_blank" class="button join-group"><i class="bi bi-person-plus"></i> Unirse</a> -->
             </div>
             <!-- = = = = =  -->
           </div>
