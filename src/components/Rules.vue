@@ -9,10 +9,9 @@
             <ul>
                 <li>No borrar una materia creada por alguien más.</li>
                 <li>No editar una materia creada por alguien más almenos que no se haya creado correctamente.</li>
-                <li>Ser muy respetuoso en cuanto a los nombres de los grupos y materias que se regitran, de preferencia
-                    registrarlos con el nombre que aparece en el horario para que los demás compañeros encuentren sus grupos rápidamente
+                <li>Registrar grupos y materias con el nombre que aparece en el horario para que el resto de compañeros encuentren sus grupos rápidamente
                 </li>
-                <li>Registrar unicamente grupos y materias escolares, evita en todo momento registrar grupos no relacionados con la escuela y las clases.</li>
+                <li>Registrar unicamente grupos y materias escolares, evitar en todo momento registrar grupos no relacionados con la escuela y las clases.</li>
             </ul>
         </div>
         <div class="handbook-container" id="handbookList">
@@ -61,8 +60,12 @@ ul{
     margin: auto;
 }
 
-.handbook{
-    margin-top: 25px;
+.handbook-container{
+    width: 90%;
+    margin: auto;    
+    margin-top: 30px;
+
+    /* border-top: solid 1px #fff; */
 }
 
 @media only screen and (max-width: 480px) {

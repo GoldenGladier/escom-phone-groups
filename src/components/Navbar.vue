@@ -8,6 +8,7 @@
           <li class="nav-item"><a href="#searchList"><i class="bi bi-search"></i> Buscar</a></li>
           <li class="nav-item"><a href="#rulesList"><i class="bi bi-bookmark-star"></i> Reglas</a></li>
           <li class="nav-item"><a href="#handbookList"><i class="bi bi-book"></i> Manual</a></li>
+          <li class="nav-item"><a href="#contactInformation"><i class="bi bi-envelope"></i> Contacto</a></li>
       </ul>
       <button class="button btn-list-menu" @click="openMenu">
         <i class="bi bi-list"></i>
@@ -22,7 +23,8 @@
             <div class="responsive-items">
                 <a class="nav-item" href="#searchList" @click="openMenu"><i class="bi bi-search"></i> Buscar</a>
                 <a class="nav-item" href="#rulesList"><i class="bi bi-bookmark-star"></i> Reglas</a>
-                <a class="nav-item"><i class="bi bi-book"></i> Manual</a>
+                <a class="nav-item" href="#handbookList"><i class="bi bi-book"></i> Manual</a>
+                <a class="nav-item" href="#contactInformation"><i class="bi bi-envelope"></i> Contacto</a>
             </div>
           </div>
       </div>    
@@ -160,7 +162,7 @@ ul li{
     justify-content: center;
     position: absolute;
     background: rgba(0, 0, 0, 0.3);
-    height: 100vh;
+    height: 120vh;
     width: 100vw;
     z-index: 2;
 }
@@ -169,6 +171,7 @@ ul li{
     align-items: center;
     justify-content: center;
     padding: 0;
+    padding-bottom: 20vh;
     margin: 0;
     height: 80%;
     width: 100%;

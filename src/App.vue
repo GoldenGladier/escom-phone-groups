@@ -7,14 +7,14 @@
       <p>Selecciona tu carrera y/o busca el grupo en el que estás inscrito.</p>
 
 
-      <select name="selectCareer" class="input select-career" v-on:change="selectFilter" v-model="selectOption" >
+      <select name="selectCareer" class="input select-career" v-on:change="selectFilter" v-model="selectOption" title="Selecciona tu carrera">
         <option value="-1">Todas las carreras</option>
         <option v-for="carrera in escom" :key="carrera['.key']" :value="carrera.name">
           {{carrera.name}}
         </option>
       </select>
 
-      <div class="search">
+      <div class="search" title="Ingresa el nombre del grupo como aparece en tu horario">
         <input v-model="inputSearchGroup" @input="inputSearchGroup = $event.target.value.toUpperCase()" type="text" name="search-group" 
         class="input search-group" placeholder="Busqueda por grupo">
         <!-- Buscar grupo, ejemplos: 2CV15, 1CM8, 2CV6, etc." -->
@@ -30,8 +30,9 @@
             <h3 class="career-name">{{carrera.name}}</h3>
             <div class="container-list-grid career-container" >
                 <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
-                  :subjects="group.subjects" :careerKey="carrera['.key']" @create-subject="registerNewSubject"
-                  :groupActive="group.active"/>
+                  :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="group.active"
+                  @create-subject="registerNewSubject" 
+                  @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" />
 
               <!-- New Group -->
               <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>
@@ -44,7 +45,6 @@
     </div>
     
     <!-- MOSTRANDO TODOS LOS DATOS -->
-    <!-- <transition name="bounce"> -->
     <transition name="bounce">
     <div v-if="!activeFilter && !loader">
       <div v-for="carrera in escom" :key="carrera['.key']">
@@ -53,7 +53,6 @@
           <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
             :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" 
             @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject"/>
-            <!-- @create-subject="registerNewSubject"  -->
 
           <!-- New Group -->
           <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>
@@ -63,13 +62,14 @@
       </div>
     </div>
     </transition>
-    <!-- </transition> -->
 
     <Loader v-if="loader"/>
 
     </div>
 
     <Rules />
+
+    <ContactInformation />
     
     <Modal :open='modalActive' :title="titleModal" :careerKey="careerKey" :groupName="groupName"  @modal-close='handleModal'
     @create-subject="registerNewSubject" :alertSubjectExist="alertSubjectExist" :loading="modalSubjectLoading"/>
@@ -101,6 +101,7 @@ import ModalGroup from './components/ModalGroup.vue';
 import Footer from './components/Footer.vue';
 import Loader from "./components/LoaderSpinner.vue";
 import Rules from "./components/Rules.vue";
+import ContactInformation from "./components/ContactInformation.vue";
 // import func from 'vue-editor-bridge'
 
 export default {
@@ -115,6 +116,7 @@ export default {
     Footer,
     Loader,
     Rules,
+    ContactInformation,
   },
   data() {
     return {
@@ -163,6 +165,11 @@ export default {
       }
       else{
         // console.log("DONE...");
+        this.escom.forEach(career => {
+          if(career.groups){
+            career.groups.sort();
+          }
+        });
         this.loader = false;
       }
       this.selectFilter();
@@ -204,9 +211,11 @@ export default {
         if(this.selectOption != -1){
           this.filter.forEach(career => {
             if(career.name == this.selectOption){
-              career.groups.forEach(group => {
-                group.active = true;
-              });
+              if(career.groups){
+                career.groups.forEach(group => {
+                  group.active = true;
+                });
+              }
               career.active = true;
             }
             else{
@@ -291,10 +300,11 @@ export default {
         // console.log("Escuchado");
       },
       handleModalESC : function(){
-        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive){
+        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive || this.modalSubjectDeleteActive){
           this.modalActive = false;
           this.modalGroupActive = false;
           this.modalSubjectEditActive = false;
+          this.modalSubjectDeleteActive = false;
           document.documentElement.style.overflow = 'initial';
         }
       },
@@ -304,6 +314,7 @@ export default {
         var careerKey = '';
         // var groups = [];
         var newCareer = [];
+        var arrayGroupsNames = [];
         this.escom.forEach(carrera => {
           if(carrera.name == careerName){
             careerKey = carrera['.key'];
@@ -311,6 +322,7 @@ export default {
             // Revisamos si existen grupos
             if(carrera.groups){
               carrera.groups.forEach(group => {
+                arrayGroupsNames.push(group.name); // Llenando array con solo nombres de los grupos
                 if(group.name == groupName){
                   groupFound = true;
                 }
@@ -325,13 +337,20 @@ export default {
         });
 
         if(!groupFound){ 
+          arrayGroupsNames.push(groupName); // Metemos el nombre al array
+          arrayGroupsNames.sort(); // Ordenamos alfabeticamente
+          console.log(arrayGroupsNames);
+          var newIndex = arrayGroupsNames.indexOf(groupName); // Definimos el indice del nuevo grupo (ordenado alfabeticamente)
+          // console.log('Indice nuevo: ' + arrayGroupsNames.indexOf(groupName));
           this.alertGroupExist = false;
           this.modalGroupLoading = true; // <-- Activate the loader
-          console.log("REGISTRANDO...");
+          // console.log("REGISTRANDO...");
           var newGroup = new Object();
           newGroup.name = groupName;
           newGroup.active = true;
-          newCareer.groups.push(newGroup);
+          // newCareer.groups.push(newGroup);
+
+          newCareer.groups.splice(newIndex, 0, newGroup); // Insertamos el grupo en el indice adecuando, sobreescribiendo cero elementos
           db.ref('escomCareers/' + careerKey).set(newCareer).then( () => {
             console.log('¡Grupo creado!');
             this.handleModalGroup();
@@ -428,6 +447,7 @@ export default {
 body, *{
   margin: 0;
   padding: 0;
+  /* background: #efefef; */
 }
 svg, img{
   vertical-align: middle;
