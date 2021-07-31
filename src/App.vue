@@ -160,16 +160,15 @@ export default {
     },
     escom : function (value) {
       if(value.length === 0){
-        // console.log("CARGANDO...");
+        // console.log("CARGANDO DATOS...");
         this.loader = true;
       }
       else{
         // console.log("DONE...");
-        this.escom.forEach(career => {
-          if(career.groups){
-            career.groups.sort();
-          }
-        });
+        // PARA PRUEBAS DE DATOS
+        // this.escom.forEach(career => {
+        //   console.log(career.name);
+        // });
         this.loader = false;
       }
       this.selectFilter();

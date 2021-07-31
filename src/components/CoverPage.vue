@@ -3,9 +3,11 @@
       <Navbar />
       <div class="container-banner">
           <div class="banner-text">
-            <h1>Encuentra tus grupos facilmente</h1>
-            <p>Escom Groups busca poner a tu disposición todos los enlaces para que te unas a los grupos de tus materias. 
-                Todos los enlaces estan ordenados por carrera y por grupo, los enlaces pueden ser de Whatsapp, Telegram, Facebook, etc.
+            <h1>Encuentra tus grupos fácilmente</h1>
+            <p>
+                Escom Groups busca poner a tu disposición todos los enlaces de Whatsapp, Telegram, etc. para que te unas 
+                a los grupos de tus materias durante este zoomestre. Todos los enlaces están ordenados por carrera y grupo, 
+                de modo que sea muy fácil encontrar las materias en las que estás inscrito. 
             </p>
           </div>
             <img src="../assets/invitation.svg" alt="groups-ws-escom" class="img">
@@ -86,6 +88,7 @@ export default {
   .banner-text{
       width: 90%;
       margin: auto;
+      text-align: center;
   }
   .img{
       width: 70%;

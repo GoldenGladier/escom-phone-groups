@@ -8,9 +8,9 @@
         <div class="column column-text">
           <div>
             <h5 class="name">Omar Aguirre Alvarez</h5>
-            <p>Desarrolle este proyecto con el afan de poder ayudar a la comunidad de ESCOM a facilitar el contacto entre compañeros de las mismas clases,
-              espero y pueda cumplir con su objetivo.
-              Si surge algun inconveniente con el sitio pueden contactarme directamente a mi correo <span>omar.fi.wwr@gmail.com</span> . 
+            <p>Desarrollé este proyecto con el afán de poder ayudar a la comunidad de ESCOM a facilitar el contacto entre compañeros 
+              de las mismas clases, espero que pueda cumplir con su objetivo. Si surge algún inconveniente con el sitio pueden 
+              contactarme directamente a mi correo <span>omar.fi.wwr@gmail.com</span> . 
              </p>
           </div>
 
