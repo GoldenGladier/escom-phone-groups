@@ -3,6 +3,7 @@
   <div class="ItemGroupList" v-if="groupActive">
       <div class="group-data" v-on:click="collapse">
         <!-- <OptionsGroup /> -->
+        <button class="btn-delete-group" @click="handdleDeleteGroup"><i class="bi bi-x"></i></button>
         {{group.name}}
         <button class="btn-view-more">
           <i class="bi bi-caret-up" v-if="collapsed"></i>
@@ -59,7 +60,8 @@ export default {
   },
   props : {
     group : [],
-    // groupKey : String,
+    groupKey : Number,
+
     subjects : Array,
     careerKey : String,
     groupActive : Boolean,
@@ -97,6 +99,10 @@ export default {
     handleDeleteSubject : function (subjectName){ // Abre el modal para Eliminar la materia
       this.$emit("modal-subject-delete", this.careerKey, this.group.name, subjectName);
     },
+    handdleDeleteGroup : function (){
+      // console.log(this.groupKey);
+      this.$emit("modal-group-delete", this.careerKey, this.groupKey); // Abre el modal para eliminar grupo
+    }
   },
 }
 </script>
@@ -118,6 +124,17 @@ export default {
 }
 .group-data{
   cursor: pointer;
+}
+
+.btn-delete-group{
+  background: transparent;
+  padding: 0 5px;
+  margin-left: 12px;
+  border: 0;
+  position: absolute;
+  left: 0;
+  outline: none;
+  z-index: 2;
 }
 
 .btn-view-more{

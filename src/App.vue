@@ -51,8 +51,8 @@
         <h3 class="career-name">{{carrera.name}}</h3>
         <div class="container-list-grid career-container" >
           <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
-            :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" 
-            @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject"/>
+            :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" :groupKey="carrera.groups.indexOf(group)"
+            @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" @modal-group-delete="handleDeleteGroup"/>
 
           <!-- New Group -->
           <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>
@@ -83,6 +83,9 @@
     <ModalDeleteSubject :open="modalSubjectDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
     :subjectName="subjectName" @modal-close='handleDeleteSubject' />
 
+    <ModalDeleteGroup :open="modalGroupDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
+    :groupKey="groupKey" :escom="escom" @modal-close='handleDeleteGroup' />
+
     <Footer />
 
   </div>
@@ -102,6 +105,7 @@ import Footer from './components/Footer.vue';
 import Loader from "./components/LoaderSpinner.vue";
 import Rules from "./components/Rules.vue";
 import ContactInformation from "./components/ContactInformation.vue";
+import ModalDeleteGroup from "./components/ModalDeleteGroup.vue";
 // import func from 'vue-editor-bridge'
 
 export default {
@@ -113,6 +117,7 @@ export default {
     ModalEditSubject,
     ModalDeleteSubject,
     ModalGroup,
+    ModalDeleteGroup,
     Footer,
     Loader,
     Rules,
@@ -152,6 +157,10 @@ export default {
       // Delete
       modalSubjectDeleteActive : false,
       subjectName : '',
+
+      // Delete Group
+      modalGroupDeleteActive : false,
+      groupKey : -1,
     }
   },
   watch : {
@@ -283,6 +292,22 @@ export default {
           document.documentElement.style.overflow = 'hidden';
         } 
       },
+      handleDeleteGroup : function(careerKey, groupKey) {
+        // console.log("Escuchado" + subjectName);
+        if(this.modalGroupDeleteActive){
+          this.modalGroupDeleteActive = false;
+          document.documentElement.style.overflow = 'initial';
+        }
+        else{
+          this.titleModal = "Eliminar Grupo"; 
+          this.careerKey = careerKey;
+          // console.log('Career key: '+this.careerKey);
+          // this.groupName = groupName;
+          this.groupKey = groupKey;
+          this.modalGroupDeleteActive = true;
+          document.documentElement.style.overflow = 'hidden';
+        } 
+      },
       handleModalGroup : function(careerName) {
         if(this.modalGroupActive){
           this.modalGroupActive = false;
@@ -299,11 +324,12 @@ export default {
         // console.log("Escuchado");
       },
       handleModalESC : function(){
-        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive || this.modalSubjectDeleteActive){
+        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive || this.modalSubjectDeleteActive || this.modalGroupDeleteActive){
           this.modalActive = false;
           this.modalGroupActive = false;
           this.modalSubjectEditActive = false;
           this.modalSubjectDeleteActive = false;
+          this.modalGroupDeleteActive = false;
           document.documentElement.style.overflow = 'initial';
         }
       },
