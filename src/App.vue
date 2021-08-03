@@ -30,9 +30,9 @@
             <h3 class="career-name">{{carrera.name}}</h3>
             <div class="container-list-grid career-container" >
                 <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
-                  :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="group.active"
+                  :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="group.active" :groupKey="carrera.groups.indexOf(group)"
                   @create-subject="registerNewSubject" 
-                  @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" />
+                  @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" @modal-group-delete="handleDeleteGroup"/>
 
               <!-- New Group -->
               <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>

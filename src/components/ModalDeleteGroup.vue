@@ -54,16 +54,14 @@ export default {
       groupName : 'NINGUNO',
     }
   },  
-//   mounted() {
-//       if(this.escom && this.open){
-
-//       }
-//   },
   watch : {
       open : function(value){
           if(value){
             this.groupName = this.escom[this.careerKey].groups[this.groupKey].name;
             // console.log(this.groupName);
+          }
+          else{
+              this.groupName = 'NINGUNO';
           }
       }
   },
