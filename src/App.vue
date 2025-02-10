@@ -1,7 +1,12 @@
 <template>
   <div id="app" @keydown.esc="handleModalESC">
     <CoverTop />
-    <div class="container-list" id="searchList">
+    <div class="notice-web-in-maintence">
+      <i class="bi bi-cone-striped"></i> 
+      <h2>Estamos en mantenimiento, volvemos en breve. ¡Gracias por tu paciencia!</h2>   
+      <i class="bi bi-cone-striped"></i> 
+    </div>
+    <div class="container-list" id="searchList" v-if="false">
       <!-- {{escom}} -->
       <h2>Buscar</h2>
       <p>Selecciona tu carrera y/o busca el grupo en el que estás inscrito.</p>
@@ -30,9 +35,9 @@
             <h3 class="career-name">{{carrera.name}}</h3>
             <div class="container-list-grid career-container" >
                 <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
-                  :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="group.active"
+                  :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="group.active" :groupKey="group['.key']"
                   @create-subject="registerNewSubject" 
-                  @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" />
+                  @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" @modal-group-delete="handleDeleteGroup"/>
 
               <!-- New Group -->
               <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>
@@ -51,8 +56,8 @@
         <h3 class="career-name">{{carrera.name}}</h3>
         <div class="container-list-grid career-container" >
           <ItemGroupList v-for="group in carrera.groups" :key="group['.key']" :group="group" @modal-open='handleModal'
-            :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" 
-            @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject"/>
+            :subjects="group.subjects" :careerKey="carrera['.key']" :groupActive="true" :groupKey="carrera.groups.indexOf(group)"
+            @modal-subject-edit="handleEditSubject" @modal-subject-delete="handleDeleteSubject" @modal-group-delete="handleDeleteGroup"/>
 
           <!-- New Group -->
           <button @click="handleModalGroup(carrera.name)" class="btn-create create-new-group"><i class="bi bi-clipboard-plus"></i> Nuevo grupo</button>
@@ -83,6 +88,9 @@
     <ModalDeleteSubject :open="modalSubjectDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
     :subjectName="subjectName" @modal-close='handleDeleteSubject' />
 
+    <ModalDeleteGroup :open="modalGroupDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
+    :groupKey="groupKey" :escom="escom" @modal-close='handleDeleteGroup' />
+
     <Footer />
 
   </div>
@@ -102,6 +110,7 @@ import Footer from './components/Footer.vue';
 import Loader from "./components/LoaderSpinner.vue";
 import Rules from "./components/Rules.vue";
 import ContactInformation from "./components/ContactInformation.vue";
+import ModalDeleteGroup from "./components/ModalDeleteGroup.vue";
 // import func from 'vue-editor-bridge'
 
 export default {
@@ -113,6 +122,7 @@ export default {
     ModalEditSubject,
     ModalDeleteSubject,
     ModalGroup,
+    ModalDeleteGroup,
     Footer,
     Loader,
     Rules,
@@ -120,9 +130,7 @@ export default {
   },
   data() {
     return {
-      list : ['omar', 'daniel', 'issac', 'etc'],
-      // groups : [],
-      escom : [],
+      escomWithoutKeys : [],
       // newData : [],
       modalActive : false,
       modalGroupActive : false,
@@ -152,6 +160,10 @@ export default {
       // Delete
       modalSubjectDeleteActive : false,
       subjectName : '',
+
+      // Delete Group
+      modalGroupDeleteActive : false,
+      groupKey : -1,
     }
   },
   watch : {
@@ -164,7 +176,6 @@ export default {
         this.loader = true;
       }
       else{
-        // console.log("DONE...");
         // PARA PRUEBAS DE DATOS
         // this.escom.forEach(career => {
         //   console.log(career.name);
@@ -181,10 +192,47 @@ export default {
     if (localStorage.selectOptionFilterByCareer) {
       this.selectOption = localStorage.selectOptionFilterByCareer;
     }
+    
+    // db.ref('escomCareers').once('value')
+    // .then(snapshot => {
+    //   const careers = snapshot.val();
+    //   const careersWithKeys = Object.keys(careers).map(key => ({
+    //     ...careers[key],
+    //     ['.key']: key, // Agrega la clave del nodo a cada objeto
+    //     groups: careers[key].groups
+    //       ? Object.entries(careers[key].groups).map(([groupkey, groupData]) => ({
+    //           ['.key']: groupkey, // ID del grupo
+    //           ...groupData,
+    //           subjects: groupData?.subjects 
+    //             ? Object.entries(groupData.subjects).map(([subjectKey, subjectData]) => ({
+    //               ['.key']: subjectKey, // ID de la materia
+    //               ...subjectData,
+    //             }))  
+    //             : [],            
+    //         }))
+    //       : [], // Si no hay grupos, retorna un array vacío                
+    //   }));
+    //   this.escom = careersWithKeys;
+    // });       
   },
-  firebase : {
-    // groups : db.ref('groups'),
-    escom : db.ref('escomCareers'),
+  firebase: {
+    escomWithoutKeys: db.ref('escomCareers') // Esto conecta tu referencia de Firebase a la propiedad 'escom'
+  },
+  computed: {
+    escom() {
+      return this.escomWithoutKeys.map((career) => ({
+        ['.key']: career['.key'],
+        ...career,
+        groups: career.groups ? Object.entries(career.groups).map(([groupKey, groupData]) => ({
+          ['.key']: groupKey,
+          ...groupData,
+          subjects: groupData.subjects ? Object.entries(groupData.subjects).map(([subjectKey, subjectData]) => ({
+            ['.key']: subjectKey,
+            ...subjectData
+          })) : []
+        })) : []
+      }));
+    }
   },
   methods : {
       inputFilter : function () {
@@ -283,6 +331,21 @@ export default {
           document.documentElement.style.overflow = 'hidden';
         } 
       },
+      handleDeleteGroup : function(careerKey, groupKey, groupName) {
+        if(this.modalGroupDeleteActive){
+          this.modalGroupDeleteActive = false;
+          document.documentElement.style.overflow = 'initial';
+        }
+        else{
+          this.titleModal = "Eliminar Grupo"; 
+          this.careerKey = careerKey;
+          // console.log('Career key: '+this.careerKey);
+          this.groupName = groupName;
+          this.groupKey = groupKey;
+          this.modalGroupDeleteActive = true;
+          document.documentElement.style.overflow = 'hidden';
+        } 
+      },
       handleModalGroup : function(careerName) {
         if(this.modalGroupActive){
           this.modalGroupActive = false;
@@ -299,116 +362,124 @@ export default {
         // console.log("Escuchado");
       },
       handleModalESC : function(){
-        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive || this.modalSubjectDeleteActive){
+        if(this.modalGroupActive || this.modalActive || this.modalSubjectEditActive || this.modalSubjectDeleteActive || this.modalGroupDeleteActive){
           this.modalActive = false;
           this.modalGroupActive = false;
           this.modalSubjectEditActive = false;
           this.modalSubjectDeleteActive = false;
+          this.modalGroupDeleteActive = false;
           document.documentElement.style.overflow = 'initial';
         }
       },
 
       registerNewGroup : function (groupName, careerName) {
-        var groupFound = false;
-        var careerKey = '';
-        // var groups = [];
-        var newCareer = [];
-        var arrayGroupsNames = [];
-        this.escom.forEach(carrera => {
-          if(carrera.name == careerName){
-            careerKey = carrera['.key'];
-            newCareer = carrera;
-            // Revisamos si existen grupos
-            if(carrera.groups){
-              carrera.groups.forEach(group => {
-                arrayGroupsNames.push(group.name); // Llenando array con solo nombres de los grupos
-                if(group.name == groupName){
-                  groupFound = true;
-                }
+          const careersRef = db.ref("escomCareers");
+
+          // Buscar la carrera directamente en Firebase
+          careersRef.once("value").then(snapshot => {
+            const careers = snapshot.val();
+
+            // Encontrar la carrera por nombre
+            const careerKey = Object.keys(careers).find(
+              key => careers[key].name === careerName
+            );
+
+            if (!careerKey) {
+              console.error("Carrera no encontrada:", careerName);
+              return;
+            }
+
+            const career = careers[careerKey];
+
+            // Asegurar que tenga un array de grupos
+            const groups = career.groups ? Object.values(career.groups) : [];
+
+            // Verificar si el grupo ya existe
+            if (groups.some(group => group.name === groupName)) {
+              this.alertGroupExist = true;
+              return;
+            }
+
+            this.alertGroupExist = false;
+            this.modalGroupLoading = true; // Activar el loader
+
+            // Crear nuevo grupo
+            const newGroup = {
+              name: groupName,
+              active: true
+            };
+
+            // Insertar el nuevo grupo y ordenar por nombre
+            groups.push(newGroup);
+            groups.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Guardar cambios en Firebase
+            careersRef.child(`${careerKey}/groups`).set(groups)
+              .then(() => {
+                console.log("¡Grupo creado!");
+                this.handleModalGroup();
+              })
+              .catch(error => {
+                console.error("Error al crear el grupo:", error);
               });
-            }
-            else{
-              newCareer.groups = [];
-              groupFound = false;
-            }
-
-          }
-        });
-
-        if(!groupFound){ 
-          arrayGroupsNames.push(groupName); // Metemos el nombre al array
-          arrayGroupsNames.sort(); // Ordenamos alfabeticamente
-          console.log(arrayGroupsNames);
-          var newIndex = arrayGroupsNames.indexOf(groupName); // Definimos el indice del nuevo grupo (ordenado alfabeticamente)
-          // console.log('Indice nuevo: ' + arrayGroupsNames.indexOf(groupName));
-          this.alertGroupExist = false;
-          this.modalGroupLoading = true; // <-- Activate the loader
-          // console.log("REGISTRANDO...");
-          var newGroup = new Object();
-          newGroup.name = groupName;
-          newGroup.active = true;
-          // newCareer.groups.push(newGroup);
-
-          newCareer.groups.splice(newIndex, 0, newGroup); // Insertamos el grupo en el indice adecuando, sobreescribiendo cero elementos
-          db.ref('escomCareers/' + careerKey).set(newCareer).then( () => {
-            console.log('¡Grupo creado!');
-            this.handleModalGroup();
-          } );
-
-        }
-        else{
-          this.alertGroupExist = true;
-        }
+          });
       },
 
       registerNewSubject : function (careerKey, groupName, subjectName, link) {
-        // console.log("Peticion recibida.")
-        var subjectFound = false;
-        var newGroup = [];
-        var indexGroup = '';
+          const careerRef = db.ref(`escomCareers/${careerKey}/groups`);
 
-        this.escom.forEach(carrera => {
-          if(carrera['.key'] == careerKey){
-            carrera.groups.forEach(group => {
-              if(group.name == groupName){
-                newGroup = group;
-                indexGroup = carrera.groups.indexOf(group);
-                // Revisamos si existen materias
-                if(group.subjects){
-                  group.subjects.forEach(subject => {
-                    if(subject.name == subjectName){
-                      subjectFound = true;
-                    }
-                  });
-                }
-                else{
-                  newGroup.subjects = [];
-                  subjectFound = false;
-                }
-              }
-            });
-          }
-        });
+          // Obtener los grupos de la carrera directamente desde Firebase
+          careerRef.once("value").then(snapshot => {
+            const groups = snapshot.val();
 
-        if(!subjectFound){ 
-          this.alertSubjectExist = false;
-          this.modalSubjectLoading = true; // <-- Activate the loader
-          // console.log("REGISTRANDO MATERIA...");
+            if (!groups) {
+              console.error("No se encontraron grupos en la carrera.");
+              return;
+            }
 
-          var newSubject = new Object();
-          newSubject.name = subjectName;
-          newSubject.linkSubject = link;
+            // Buscar el grupo por nombre
+            const groupKey = Object.keys(groups).find(
+              key => groups[key].name === groupName
+            );
 
-          newGroup.subjects.push(newSubject);
-          newGroup.active = true;
-          db.ref('escomCareers/' + careerKey + '/groups/' + indexGroup).set(newGroup).then( () => {
-            console.log('¡Materia creada!');
-            this.handleModal();
-          } );
-        }
-        else{
-          this.alertSubjectExist = true;
-        }
+            if (!groupKey) {
+              console.error("Grupo no encontrado:", groupName);
+              return;
+            }
+
+            const group = groups[groupKey];
+
+            // Asegurar que tenga un array de materias
+            const subjects = group.subjects ? Object.values(group.subjects) : [];
+
+            // Verificar si la materia ya existe
+            if (subjects.some(subject => subject.name === subjectName)) {
+              this.alertSubjectExist = true;
+              return;
+            }
+
+            this.alertSubjectExist = false;
+            this.modalSubjectLoading = true; // Activar el loader
+
+            // Crear la nueva materia
+            const newSubject = {
+              name: subjectName,
+              linkSubject: link
+            };
+
+            // Agregar la nueva materia
+            subjects.push(newSubject);
+
+            // Guardar cambios en Firebase
+            careerRef.child(`${groupKey}/subjects`).set(subjects)
+              .then(() => {
+                console.log("¡Materia creada!");
+                this.handleModal();
+              })
+              .catch(error => {
+                console.error("Error al crear la materia:", error);
+              });
+          });
       },
 
 
@@ -614,5 +685,15 @@ button.search-group{
   background: rgba(191, 19, 99, 0.15);
   border-color: rgba(191, 19, 99, 0.6);
   color: #38081f;
+}
+
+.notice-web-in-maintence {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.notice-web-in-maintence i{
+  font-size: 3.5rem;
+  color: #FBA518;  
 }
 </style>
