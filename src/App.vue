@@ -1,12 +1,12 @@
 <template>
   <div id="app" @keydown.esc="handleModalESC">
     <CoverTop />
-    <div class="notice-web-in-maintence">
+    <div class="notice-web-in-maintence" v-if="webInMaintence">
       <i class="bi bi-cone-striped"></i> 
       <h2>Estamos en mantenimiento, volvemos en breve. ¡Gracias por tu paciencia!</h2>   
       <i class="bi bi-cone-striped"></i> 
     </div>
-    <div class="container-list" id="searchList" v-if="false">
+    <div class="container-list" id="searchList" v-else>
       <!-- {{escom}} -->
       <h2>Buscar</h2>
       <p>Selecciona tu carrera y/o busca el grupo en el que estás inscrito.</p>
@@ -130,6 +130,7 @@ export default {
   },
   data() {
     return {
+      webInMaintence: false,
       escomWithoutKeys : [],
       // newData : [],
       modalActive : false,
