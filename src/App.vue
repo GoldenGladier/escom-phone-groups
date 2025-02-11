@@ -88,9 +88,6 @@
     <ModalDeleteSubject :open="modalSubjectDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
     :subjectName="subjectName" @modal-close='handleDeleteSubject' />
 
-    <ModalDeleteGroup :open="modalGroupDeleteActive" :title="titleModal" :careerKey="careerKey" :groupName="groupName"  
-    :groupKey="groupKey" :escom="escom" @modal-close='handleDeleteGroup' />
-
     <Footer />
 
   </div>
@@ -110,7 +107,6 @@ import Footer from './components/Footer.vue';
 import Loader from "./components/LoaderSpinner.vue";
 import Rules from "./components/Rules.vue";
 import ContactInformation from "./components/ContactInformation.vue";
-import ModalDeleteGroup from "./components/ModalDeleteGroup.vue";
 // import func from 'vue-editor-bridge'
 
 export default {
@@ -122,7 +118,6 @@ export default {
     ModalEditSubject,
     ModalDeleteSubject,
     ModalGroup,
-    ModalDeleteGroup,
     Footer,
     Loader,
     Rules,
