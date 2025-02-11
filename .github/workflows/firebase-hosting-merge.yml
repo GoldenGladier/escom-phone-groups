@@ -19,9 +19,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Update dependencies (si es necesario)
-        run: npm run update  # Solo si tienes un script 'update' configurado
-        
+      - name: Update dependencies
+        run: npm update  # Esto asegura que todas las dependencias estén actualizadas
+
       # Paso para hacer build
       - name: Build project
         run: npm run build
